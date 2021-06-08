@@ -3,8 +3,7 @@ info:
   title: SmartVista RESTful API
   version: 1.0.0
 servers:
-  - url: 'https://localhost:7001/sv/rest'
-  - url: 'http://localhost:7001/sv/rest'
+  - url: '/sv/rest'
 tags:
   - name: application
     description: Create internal entities and process it
