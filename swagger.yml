@@ -1,320 +1,611 @@
-openapi: "3.0.2"
+openapi: 3.0.1
 info:
-  title: "OpenWeatherMap API"
-  description: "Get the current weather, daily forecast for 16 days, and a three-hour-interval forecast for 5 days for your city. Helpful stats, graphics, and this day in history charts are available for your reference. Interactive maps show precipitation, clouds, pressure, wind around your location stations. Data is available in JSON, XML, or HTML format. **Note**: This sample Swagger file covers the `current` endpoint only from the OpenWeatherMap API. <br/><br/> **Note**: All parameters are optional, but you must select at least one parameter. Calling the API by city ID (using the `id` parameter) will provide the most precise location results."
-  version: "2.5"
-  termsOfService: "https://openweathermap.org/terms"
-  contact:
-    name: "OpenWeatherMap API"
-    url: "https://openweathermap.org/api"
-    email: "some_email@gmail.com"
-  license:
-    name: "CC Attribution-ShareAlike 4.0 (CC BY-SA 4.0)"
-    url: "https://openweathermap.org/price"
-
+  title: SmartVista RESTful API
+  version: 1.0.0
 servers:
-- url: "https://api.openweathermap.org/data/2.5"
-
+  - url: 'https://localhost:7001/sv/rest'
+  - url: 'http://localhost:7001/sv/rest'
+tags:
+  - name: application
+    description: Create internal entities and process it
+    externalDocs:
+      description: Find out more
+      url: 'https://confluence.bpcbt.com/'
 paths:
-  /weather:
-    get:
+  /application:
+    post:
       tags:
-      - Current Weather Data
-      summary: "Call current weather data for one location"
-      description: "Access current weather data for any location on Earth including over 200,000 cities! Current weather is frequently updated based on global models and data from more than 40,000 weather stations."
-      operationId: CurrentWeatherData
-      parameters:
-        - $ref: '#/components/parameters/q'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/lat'
-        - $ref: '#/components/parameters/lon'
-        - $ref: '#/components/parameters/zip'
-        - $ref: '#/components/parameters/units'
-        - $ref: '#/components/parameters/lang'
-        - $ref: '#/components/parameters/mode'
-
+        - application
+      summary: Process incoming applications
+      requestBody:
+        description: Application objects that needs to be processed
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+        required: true
       responses:
-        "200":
-          description: Successful response
+        '200':
+          description: Success or logical errors
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/200'
-        "404":
-          description: Not found response
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid application
           content:
-            text/plain:
+            application/json:
               schema:
-                title: Weather not found
-                type: string
-                example: Not found
-security:
-- app_id: []
-
-tags:
-  - name: Current Weather Data
-    description: "Get current weather details"
-
-externalDocs:
-  description: API Documentation
-  url: https://openweathermap.org/api
-
+                $ref: '#/components/schemas/InvalidRequest'
+  '/application/{applicationId}':
+    get:
+      tags:
+        - application
+      summary: Get application by its ID
+      description: Returns a single application
+      operationId: getPetById
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of application to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '404':
+          description: Application not found
 components:
-
-  parameters:
-    q:
-      name: q
-      in: query
-      description: "**City name**. *Example: London*. You can call by city name, or by city name and country code. The API responds with a list of results that match a searching word. For the query value, type the city name and optionally the country code divided by a comma; use ISO 3166 country codes."
-      schema:
-        type: string
-    id:
-      name: id
-      in: query
-      description: "**City ID**. *Example: `2172797`*. You can call by city ID. The API responds with the exact result. The List of city IDs can be downloaded [here](http://bulk.openweathermap.org/sample/). You can include multiple cities in this parameter &mdash; just separate them by commas. The limit of locations is 20. *Note: A single ID counts as a one API call. So, if you have city IDs, it's treated as 3 API calls.*"
-      schema:
-        type: string
-
-    lat:
-      name: lat
-      in: query
-      description: "**Latitude**. *Example: 35*. The latitude coordinate of the location of your interest. Must use with `lon`."
-      schema:
-        type: string
-
-    lon:
-      name: lon
-      in: query
-      description: "**Longitude**. *Example: 139*. Longitude coordinate of the location of your interest. Must use with `lat`."
-      schema:
-        type: string
-
-    zip:
-      name: zip
-      in: query
-      description: "**Zip code**. Search by zip code. *Example: 95050,us*. Please note that if the country is not specified, the search uses USA as a default."
-      schema:
-        type: string
-
-    units:
-      name: units
-      in: query
-      description: '**Units**. *Example: imperial*. Possible values: `standard`, `metric`, and `imperial`. When you do not use the `units` parameter, the format is `standard` by default.'
-      schema:
-        type: string
-        enum: [standard, metric, imperial]
-        default: "imperial"
-
-    lang:
-      name: lang
-      in: query
-      description: '**Language**. *Example: en*. You can use lang parameter to get the output in your language. We support the following languages that you can use with the corresponded lang values: Arabic - `ar`, Bulgarian - `bg`, Catalan - `ca`, Czech - `cz`, German - `de`, Greek - `el`, English - `en`, Persian (Farsi) - `fa`, Finnish - `fi`, French - `fr`, Galician - `gl`, Croatian - `hr`, Hungarian - `hu`, Italian - `it`, Japanese - `ja`, Korean - `kr`, Latvian - `la`, Lithuanian - `lt`, Macedonian - `mk`, Dutch - `nl`, Polish - `pl`, Portuguese - `pt`, Romanian - `ro`, Russian - `ru`, Swedish - `se`, Slovak - `sk`, Slovenian - `sl`, Spanish - `es`, Turkish - `tr`, Ukrainian - `ua`, Vietnamese - `vi`, Chinese Simplified - `zh_cn`, Chinese Traditional - `zh_tw`.'
-      schema:
-        type: string
-        enum: [ar, bg, ca, cz, de, el, en, fa, fi, fr, gl, hr, hu, it, ja, kr, la, lt, mk, nl, pl, pt, ro, ru, se, sk, sl, es, tr, ua, vi, zh_cn, zh_tw]
-        default: "en"
-
-    mode:
-      name: mode
-      in: query
-      description: "**Mode**. *Example: html*. Determines the format of the response. Possible values are `json`, `xml`, and `html`. If the mode parameter is empty, the format is `json` by default."
-      schema:
-        type: string
-        enum: [json, xml, html]
-        default: "json"
-
   schemas:
-    "200":
-      title: Successful response
+    Application:
+      required:
+        - agent_id
+        - application_flow_id
+        - application_type
+        - customer
+        - customer_type
+        - institution_id
       type: object
       properties:
-        coord:
-          $ref: '#/components/schemas/Coord'
-        weather:
+        application_type:
+          type: string
+          format: 'APTP[0-9A-Z]{1,4}'
+          example: APTPISSA
+        application_flow_id:
+          type: integer
+          example: 1001
+        application_status:
+          type: string
+          format: 'APST[0-9A-Z]{1,4}'
+          example: APST0006
+        operator_id:
+          type: string
+          example: OPERATOR1
+        institution_id:
+          type: integer
+          example: 1001
+        agent_id:
+          type: integer
+          example: 10000001
+        agent_number:
+          type: string
+          example: 10000001
+        customer_type:
+          type: string
+          format: 'ENTT[0-9A-Z]{1,4}'
+          example: ENTTPERS
+        customer:
           type: array
           items:
-            $ref: '#/components/schemas/Weather'
-          description: (more info Weather condition codes)
-        base:
+            $ref: '#/components/schemas/Customer'
+    Customer:
+      required:
+        - command
+        - customer_number
+        - nationality
+      type: object
+      properties:
+        command:
           type: string
-          description: Internal parameter
-          example: cmc stations
-        main:
-          $ref: '#/components/schemas/Main'
-        visibility:
-          type: integer
-          description: Visibility, meter
-          example: 16093
-        wind:
-          $ref: '#/components/schemas/Wind'
-        clouds:
-          $ref: '#/components/schemas/Clouds'
-        rain:
-          $ref: '#/components/schemas/Rain'
-        snow:
-          $ref: '#/components/schemas/Snow'
-        dt:
-          type: integer
-          description: Time of data calculation, unix, UTC
-          format: int32
-          example: 1435658272
-        sys:
-          $ref: '#/components/schemas/Sys'
-        id:
-          type: integer
-          description: City ID
-          format: int32
-          example: 2172797
-        name:
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCREX
+        customer_number:
           type: string
-          example: Cairns
-        cod:
-          type: integer
-          description: Internal parameter
-          format: int32
-          example: 200
-    Coord:
-      title: Coord
-      type: object
-      properties:
-        lon:
-          type: number
-          description: City geo location, longitude
-          example: 145.77000000000001
-        lat:
-          type: number
-          description: City geo location, latitude
-          example: -16.920000000000002
-    Weather:
-      title: Weather
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Weather condition id
-          format: int32
-          example: 803
-        main:
+          example: 009302127
+        customer_category:
           type: string
-          description: Group of weather parameters (Rain, Snow, Extreme etc.)
-          example: Clouds
-        description:
+          format: 'CCTG[0-9A-Z]{1,4}'
+          example: CCTGORDN
+        customer_relation:
           type: string
-          description: Weather condition within the group
-          example: broken clouds
-        icon:
-          type: string
-          description: Weather icon id
-          example: 04n
-    Main:
-      title: Main
-      type: object
-      properties:
-        temp:
-          type: number
-          description: 'Temperature. Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.'
-          example: 293.25
-        pressure:
+          format: 'RSCB[0-9A-Z]{1,4}'
+          example: RSCBEXTR
+        resident:
           type: integer
-          description: Atmospheric pressure (on the sea level, if there is no sea_level or grnd_level data), hPa
-          format: int32
-          example: 1019
-        humidity:
-          type: integer
-          description: Humidity, %
-          format: int32
-          example: 83
-        temp_min:
-          type: number
-          description: 'Minimum temperature at the moment. This is deviation from current temp that is possible for large cities and megalopolises geographically expanded (use these parameter optionally). Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.'
-          example: 289.81999999999999
-        temp_max:
-          type: number
-          description: 'Maximum temperature at the moment. This is deviation from current temp that is possible for large cities and megalopolises geographically expanded (use these parameter optionally). Unit Default: Kelvin, Metric: Celsius, Imperial: Fahrenheit.'
-          example: 295.37
-        sea_level:
-          type: number
-          description: Atmospheric pressure on the sea level, hPa
-          example: 984
-        grnd_level:
-          type: number
-          description: Atmospheric pressure on the ground level, hPa
-          example: 990
-    Wind:
-      title: Wind
-      type: object
-      properties:
-        speed:
-          type: number
-          description: 'Wind speed. Unit Default: meter/sec, Metric: meter/sec, Imperial: miles/hour.'
-          example: 5.0999999999999996
-        deg:
-          type: integer
-          description: Wind direction, degrees (meteorological)
-          format: int32
-          example: 150
-    Clouds:
-      title: Clouds
-      type: object
-      properties:
-        all:
-          type: integer
-          description: Cloudiness, %
-          format: int32
-          example: 75
-    Rain:
-      title: Rain
-      type: object
-      properties:
-        3h:
-          type: integer
-          description: Rain volume for the last 3 hours
-          format: int32
-          example: 3
-    Snow:
-      title: Snow
-      type: object
-      properties:
-        3h:
-          type: number
-          description: Snow volume for the last 3 hours
-          example: 6
-    Sys:
-      title: Sys
-      type: object
-      properties:
-        type:
-          type: integer
-          description: Internal parameter
-          format: int32
           example: 1
-        id:
-          type: integer
-          description: Internal parameter
-          format: int32
-          example: 8166
-        message:
-          type: number
-          description: Internal parameter
-          example: 0.0166
-        country:
+        nationality:
           type: string
-          description: Country code (GB, JP etc.)
-          example: AU
-        sunrise:
+          format: '[A-Z]{3}'
+          example: RUS
+        employment_status:
+          type: string
+          format: 'CSES[0-9A-Z]{1,4}'
+          example: CSESEMPL
+        employment_period:
+          type: string
+          format: 'EMPR[0-9A-Z]{1,4}'
+          example: EMPR0001
+        residence_type:
+          type: string
+          format: 'REST[0-9A-Z]{1,4}'
+          example: RESTRENT
+        marital_status_date:
+          type: string
+          format: YYYY-MM-DD
+          example: 2016-02-01T00:00:00.000Z
+        number_of_children:
+          type: string
+          format: 'CHLD[0-9A-Z]{1,4}'
+          example: CHLD0001
+        contract:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contract'
+        person:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+        contact:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        notification:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+    Contract:
+      required:
+        - command
+        - contract_number
+        - contract_type
+        - product_id
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCREX
+        contract_type:
+          type: string
+          format: 'CNTP[0-9A-Z]{1,4}'
+          example: CNTPBANK
+        product_id:
           type: integer
-          description: Sunrise time, unix, UTC
-          format: int32
-          example: 1435610796
-        sunset:
+          example: 1
+        contract_number:
+          type: string
+          example: 9302127001
+        start_date:
+          type: string
+          format: YYYY-MM-DD
+          example: 2021-10-02T00:00:00.000Z
+        end_date:
+          type: string
+          format: YYYY-MM-DD
+          example: 2023-10-02T00:00:00.000Z
+        card:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        account:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        service:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+    Card:
+      required:
+        - card_type
+        - category
+        - command
+      type: object
+      properties:
+        id:
+          type: string
+          example: card_1
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCREX
+        delivery_agent_number:
+          type: string
+          example: 123
+        card_type:
           type: integer
-          description: Sunset time, unix, UTC
-          format: int32
-          example: 1435650870
-
-  securitySchemes:
-    app_id:
-      type: apiKey
-      description: "API key to authorize requests. (If you don't have an API key, get one at https://openweathermap.org/. See https://idratherbewriting.com/learnapidoc/docapis_get_auth_keys.html for details.)"
-      name: appid
-      in: query
+          example: 1004
+        category:
+          type: string
+          format: 'CRCG[0-9A-Z]{1,4}'
+          example: CRCG0800
+        cardholder:
+          type: array
+          items:
+            $ref: '#/components/schemas/Cardholder'
+    Cardholder:
+      required:
+        - cardholder_number
+        - command
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCRPR
+        cardholder_number:
+          type: string
+          example: CH_7
+        cardholder_name:
+          type: string
+          example: PETROV ALEX
+        cardholder_photo_file_name:
+          type: string
+          example: File_1.img
+        cardholder_sign_file_name:
+          type: string
+          example: File_2.img
+        notification:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        sec_word:
+          type: object
+          items:
+            $ref: '#/components/schemas/Security'
+        language_preference:
+          type: object
+          items:
+            $ref: '#/components/schemas/Preference'
+    Security:
+      required:
+        - secret_answer
+        - secret_question
+      type: object
+      properties:
+        secret_question:
+          type: string
+          format: 'SEQU[0-9A-Z]{1,4}'
+          example: SEQUWORD
+        secret_answer:
+          type: string
+          example: qwerty
+    Preference:
+      required:
+        - command
+        - preferred_lang
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCRUP
+        preferred_lang:
+          type: string
+          format: 'LANG[0-9A-Z]{1,4}'
+          example: LANGENG
+    Notification:
+      required:
+        - command
+        - delivery_address
+        - delivery_channel
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCREX
+        delivery_channel:
+          type: integer
+          example: 3
+        delivery_address:
+          type: string
+          example: 79161234567
+        is_active:
+          type: integer
+          example: 1
+    Address:
+      required:
+        - address_type
+        - command
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCRUP
+        address_type:
+          type: string
+          format: 'ADTP[0-9A-Z]{1,4}'
+          example: ADTPHOME
+        address_name:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressName'
+    AddressName:
+      required:
+        - language
+      type: object
+      properties:
+        language:
+          type: string
+          format: 'LANG[0-9A-Z]{1,4}'
+          example: LANGENG
+        region:
+          type: string
+          example: Moscow DC
+        city:
+          type: string
+          example: Moscow
+        street:
+          type: string
+          example: Tverskaya
+        house:
+          type: string
+          example: 11
+        apartment:
+          type: string
+          example: 120
+    Contact:
+      required:
+        - command
+        - contact_type
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCRUP
+        contact_type:
+          type: string
+          format: 'CNTT[0-9A-Z]{1,4}'
+          example: CNTTPRMC
+        preferred_lang:
+          type: string
+          format: 'LANG[0-9A-Z]{1,4}'
+          example: LANGENG
+        contact_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactData'
+    ContactData:
+      required:
+        - commun_address
+        - commun_method
+      type: object
+      properties:
+        commun_method:
+          type: string
+          format: 'CMNM[0-9A-Z]{1,4}'
+          example: CMNM0001
+        commun_address:
+          type: string
+          format: 'CNTT[0-9A-Z]{1,4}'
+          example: 79161234511
+    Person:
+      required:
+        - command
+        - person_name
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCRUP
+        person_name:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonName'
+        identity_card:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityCard'
+    Account:
+      required:
+        - account_number
+        - account_type
+        - command
+        - currency
+      type: object
+      properties:
+        id:
+          type: string
+          example: account_1
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCREX
+        account_number:
+          type: string
+          example: 40817810100000780000
+        currency:
+          type: integer
+          example: 643
+        account_type:
+          type: string
+          format: 'ACTP[0-9A-Z]{1,4}'
+          example: ACTP0100
+        account_object:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountObject'
+    AccountObject:
+      required:
+        - account_link_flag
+        - ref_id
+      type: object
+      properties:
+        ref_id:
+          type: string
+          example: card_1
+        account_link_flag:
+          type: integer
+          example: 1
+    PersonName:
+      required:
+        - language
+      type: object
+      properties:
+        language:
+          type: string
+          format: 'LANG[0-9A-Z]{1,4}'
+          example: LANGENG
+        first_name:
+          type: string
+          example: Ivan
+        second_name:
+          type: string
+          example: Ivanovich
+        surname:
+          type: string
+          example: Ivanov
+    IdentityCard:
+      required:
+        - command
+        - id_number
+        - id_type
+      type: object
+      properties:
+        command:
+          type: string
+          format: 'CMMD[0-9A-Z]{1,4}'
+          example: CMMDCRUP
+        id_type:
+          type: string
+          format: 'IDTP[0-9A-Z]{1,4}'
+          example: IDTP0001
+        id_series:
+          type: string
+          example: 4412
+        id_number:
+          type: string
+          example: 555555
+    Service:
+      required:
+        - service_object
+        - value
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 10002157
+        service_object:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceObject'
+    ServiceObject:
+      required:
+        - ref_id
+      type: object
+      properties:
+        ref_id:
+          type: integer
+          example: 10002157
+        start_date:
+          type: string
+          format: YYYY-MM-DD
+          example: 2021-10-02T00:00:00.000Z
+        end_date:
+          type: string
+          format: YYYY-MM-DD
+          example: 2023-10-02T00:00:00.000Z
+        attribute_num:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributeNumber'
+        attribute_char:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributeChar'
+        attribute_limit:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributeLimit'
+    AttributeNumber:
+      required:
+        - attribute_value_num
+        - value
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 10002774
+        attribute_value_num:
+          type: integer
+          example: 1000
+    AttributeChar:
+      required:
+        - attribute_value_char
+        - value
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 10002773
+        attribute_value_char:
+          type: string
+          example: CRDP0002
+    AttributeLimit:
+      required:
+        - limit_check_type
+        - value
+      type: object
+      properties:
+        value:
+          type: integer
+          example: 10003350
+        limit_sum_value:
+          type: integer
+          example: 2000
+        limit_check_type:
+          type: string
+          format: 'LCHT[0-9A-Z]{1,4}'
+          example: LCHT0001
+        currency:
+          type: integer
+          example: 643
+        counter_algorithm:
+          type: string
+          format: 'ACCL[0-9A-Z]{1,4}'
+          example: ACCL0001
+    InvalidRequest:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+          format: int64
+          example: 1623140259149
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        exception:
+          type: string
+          example: HttpMessageNotReadableException
+        message:
+          type: string
+          example: 'JSON parse error: Unrecognized token'
+        path:
+          type: string
+          example: /sv/rest/application
